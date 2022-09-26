@@ -1,0 +1,492 @@
+SELECT SUM(SALARY), DEPARTMENT_ID  FROM S_HREMPLOYEES
+GROUP BY DEPARTMENT_ID  ; 
+
+SELECT AVG(SALARY), MANAGER_ID 
+FROM S_HREMPLOYEES
+GROUP BY MANAGER_ID 
+ORDER BY AVG(SALARY) DESC;
+
+SELECT MIN(SALARY), DEPARTMENT_ID  
+FROM S_HREMPLOYEES
+WHERE DEPARTMENT_ID  IS NOT NULL 
+GROUP BY DEPARTMENT_ID
+ORDER BY MIN (SALARY) ;  
+
+SELECT MAX(SALARY), DEPARTMENT_ID  
+FROM S_HREMPLOYEES
+WHERE DEPARTMENT_ID  IS NOT NULL 
+GROUP BY DEPARTMENT_ID
+ORDER BY MIN (SALARY) DESC;
+
+SELECT COUNT(*), DEPARTMENT_ID
+FROM S_HREMPLOYEES
+GROUP BY DEPARTMENT_ID ;
+
+SELECT * FROM S_HREMPLOYEES;
+
+SELECT DEPARTMENT_ID ,SALARY,DENSE_RANK ()
+OVER (  ORDER BY SALARY ) AS DRANK
+FROM S_HREMPLOYEES;
+
+SELECT * FROM (
+SELECT DENSE_RANK () OVER (PARTITION BY DEPARTMENT_ID ORDER BY SALARY  DESC) AS DRNK,SALARY,DEPARTMENT_ID
+FROM DBO.S_HREMPLOYEES sh 
+--WHERE DEPARTMENT_ID=90
+)_
+WHERE DRNK=2
+
+--RANK 
+
+SELECT FIRST_NAME , SALARY , 
+RANK() OVER (
+   ORDER BY SALARY DESC )
+FROM  S_HREMPLOYEES sh;
+   
+JOINS
+
+
+--1. INNER JOIN WITHOUT USING THE INNER KEYWORD
+
+SELECT
+	SH.EMPLOYEE_ID,
+	SH2.DEPARTMENT_NAME,
+	FIRST_NAME ,
+	LAST_NAME
+FROM
+	DBO.S_HREMPLOYEES sh ,
+	DBO.S_HRDEPARTMENTS sh2
+WHERE
+	SH.DEPARTMENT_ID = SH2.DEPARTMENT_ID;
+	
+
+-- INNER JOIN WITH INNER KEY WORD 
+SELECT
+	SH.EMPLOYEE_ID,
+	SH2.DEPARTMENT_NAME,
+	FIRST_NAME ,
+	LAST_NAME
+FROM
+	DBO.S_HREMPLOYEES sh
+INNER JOIN DBO.S_HRDEPARTMENTS sh2 
+ON
+	SH.DEPARTMENT_ID = SH2.DEPARTMENT_ID;
+	
+
+-- INNER JOIN WITH INNER KEY WORD 
+SELECT
+	S_HREMPLOYEES.EMPLOYEE_ID,
+	S_HRDEPARTMENTS.DEPARTMENT_NAME,
+	FIRST_NAME ,
+	LAST_NAME
+FROM
+	S_HREMPLOYEES
+INNER JOIN S_HRDEPARTMENTS
+ON
+	S_HREMPLOYEES.DEPARTMENT_ID = S_HRDEPARTMENTS.DEPARTMENT_ID;
+
+---INNER JOININNG 3 TABLES WITHOUT KEYWORD
+SELECT
+	*
+FROM
+	DBO.S_HREMPLOYEES sh ,
+	DBO.S_HRDEPARTMENTS sh2,
+	DBO.S_HRLOCATIONS sh3 
+WHERE
+	SH.DEPARTMENT_ID = SH2.DEPARTMENT_ID
+AND SH2.LOCATION_ID=SH3.lOCATION_ID;
+
+SELECT * FROM S_HRLOCATIONS sh 
+SELECT * FROM S_HREMPLOYEES sh2 
+SELECT * FROM S_HRDEPARTMENTS sh3;
+
+--INNER JOINING 3 TABLES
+SELECT * FROM S_HREMPLOYEES sh 
+INNER JOIN S_HRDEPARTMENTS sh2 ON sh.DEPARTMENT_ID = sh2.DEPARTMENT_ID 
+INNER JOIN S_HRLOCATIONS sh3  ON sh2.LOCATION_ID = sh3.LOCATION_ID ;
+
+-- OUTER JOIN
+SELECT * FROM S_HREMPLOYEES sh 
+FULL OUTER JOIN S_HRDEPARTMENTS sh2
+ON sh.MANAGER_ID =sh2.MANAGER_ID ;
+
+--RIGHT OUTER JOIN
+SELECT * FROM S_HREMPLOYEES sh 
+RIGHT OUTER JOIN S_HRDEPARTMENTS sh2
+ON sh.MANAGER_ID =sh2.MANAGER_ID 
+WHERE sh2.MANAGER_ID  IS NULL;
+
+
+--SUBQUERY
+SELECT * FROM S_HREMPLOYEES sh 
+WHERE DEPARTMENT_ID IN (SELECT DEPARTMENT_ID  FROM S_HRDEPARTMENTS sh2);
+
+--NESTED QUERY
+SELECT * FROM S_DEPARTMENTS sh 
+WHERE COMMISSION_PCT IN (
+SELECT EMPLOYEE_ID FROM S_HREMPLOYEES sh2
+WHERE COMMISSION_PCT IS NOT NULL);
+
+SELECT * FROM SKT_EMPLOYEE;
+
+DELETE FROM SKT_EMPLOYEE WHERE emp_id = 1000;
+
+SELECT * FROM SKT_EMPLOYEE;
+
+
+--UPDATE 
+
+UPDATE SKT_EMPLOYEE 
+SET dept_id =2
+WHERE emp_id =13047;
+SELECT * FROM SKT_EMPLOYEE;
+
+CREATE TABLE SKT_CUSTOMERS(
+c_id SERIAL PRIMARY KEY,
+c_name VARCHAR(100) NOT NULL,
+c_email VARCHAR(100) NOT NULL UNIQUE,
+c_emp_id
+)
+
+CREATE TABLE SKT_NEWTABLE(
+r_id INT,
+r_name VARCHAR(200),
+);
+
+INSERT INTO SKT_NEWTABLE(r_id,r_name)
+VALUES(1,'Santosh'),
+(1,'Santosh'),
+(1,'Santosh');
+
+SELECT * FROM SKT_NEWTABLE;
+
+INSERT INTO SKT_NEWTABLE(r_id,r_name)
+VALUES(2,'Sweekar');
+
+--How to delete the duplicate rows?
+--How to search name that has last character 'r'?
+--How to load the data in SSIS from flat file to Excel file?
+
+SELECT * FROM SKT_NEWTABLE WHERE r_name LIKE '%r';
+
+CREATE TABLE SKT_LOOKUPTABLE(
+id INT,
+name VARCHAR(200),
+);
+
+INSERT INTO SKT_LOOKUPTABLE(id,name)
+VALUES(10,'qwe'),
+(11,'asd');
+
+SELECT * FROM SKT_LOOKUPTABLE ;
+
+CREATE TABLE SKT_LOOKUPFROMXL(
+	Row_ID int ,
+	Order_ID varchar(255) ,
+	Order_Date date,
+	Ship_Date date,
+	Ship_Mode varchar(255),
+	Customer_ID varchar(255),
+	Customer_Name varchar(255),
+	Segment varchar(255),
+	Country varchar(255),
+	City varchar(255),
+	State varchar(255),
+	Postal_Code int,
+	Region varchar(255),
+	Product_ID varchar(255),
+	Category varchar(255),
+	Sub_Category varchar(255),
+	Product_Name varchar(255),
+	Sales float ,
+	Quantity int ,
+	Discount float ,
+	Profit float 
+);
+
+SELECT * FROM SKT_LOOKUPFROMXL sl 
+WHERE Ship_Mode = 'Second Class';
+
+CREATE TABLE SKT_DATA_FROM_MULTIPLE_FLAT(
+id INT,
+name VARCHAR(50)
+);
+
+SELECT * FROM SKT_DATA_FROM_MULTIPLE_FLAT;
+
+CREATE TABLE SKT_SEQUENCE_TGT(
+id INT,
+name VARCHAR(50)
+);
+
+CREATE TABLE SKT_SEQUENCE_TGT1(
+id INT,
+name VARCHAR(50)
+);
+
+TRUNCATE TABLE SKT_SEQUENCE_TGT;
+TRUNCATE TABLE SKT_SEQUENCE_TGT;
+
+SELECT * FROM SKT_SEQUENCE_TGT1;
+
+TRUNCATE TABLE SKT_DATA_FROM_MULTIPLE_FLAT;
+
+
+--JOINS PRACTICE
+
+create table SKT_customer
+(
+cust_id int,
+cust_name varchar(100),
+cust_mob varchar(15),
+cust_country varchar(50)
+);
+
+create table SKT_order1
+(
+order_id int,
+cust_id int,
+order_date date
+);
+
+select from SKT_customer;
+
+select from SKT_order1;
+
+insert into SKT_customer
+values(6, 'Jane', '12319999', 'France'),
+(7, 'Max', '99994646', 'Canada');
+(3, 'Raj', '78978999', 'London');
+(4, 'Ram', '3452879', 'India'),
+(5, 'Krish', '18924567', 'UK');
+
+insert into SKT_order1
+values(101,8, '02-03-2022'), 
+(101,9, '02-03-2022'), 
+(102,8, '04-12-2022'),
+(102,9, '12-03-2022');
+(103,3, '12-05-2022'),
+ (103,3, '11-03-2022'),
+(164,4, '08-06-2022'),
+(104,4, '12-08-2022'),
+(105,5, '10-01-2022'), 
+(105,5, '02-03-2022');
+
+SELECT * FROM SKT_customer;
+SELECT * FROM SKT_order1;
+
+--THE BELOW QUERY ID FOR INNER JOIN
+select *
+from SKT_customer as cust
+inner join SKT_order1 as od
+on cust.cust_id=od.cust_id;
+
+--THE BELOW QUERY ID FOR LEFT JOIN
+select *
+from SKT_customer as cust
+LEFT join SKT_order1 as od
+on cust.cust_id=od.cust_id;
+
+--THE BELOW QUERY ID FOR RIGHT JOIN
+select *
+from SKT_customer as cust
+RIGHT join SKT_order1 as od
+on cust.cust_id=od.cust_id;
+
+--THE BELOW QUERY ID FOR FULL JOIN
+select *
+from SKT_customer as cust
+FULL join SKT_order1 as od
+on cust.cust_id=od.cust_id;
+
+--Create two tables(like Employee--empId, name, zipcode) and Address table--(zipcode, city, country)Define joins with different types:
+CREATE TABLE SKT_JOIN_EMP(
+emp_id INT,
+emp_name VARCHAR(50),
+zipcode INT);
+
+CREATE TABLE SKT_JOIN_ADDRESS(
+zip_code INT,
+city VARCHAR(50),
+country VARCHAR(50)
+);
+
+INSERT INTO SKT_JOIN_EMP 
+VALUES(1,'A',10),(2,'B',11),(3,'C',10),(4,'D',13);
+
+INSERT INTO SKT_JOIN_ADDRESS 
+VALUES(10,'Banglore','India'),(11,'Pune','Maharashtra'),(12,'California','USA');
+
+
+--Inner Join
+select *
+from SKT_JOIN_EMP as em
+INNER join SKT_JOIN_ADDRESS as ad
+on em.zipcode=ad.zip_code;
+
+--Left Join
+select *
+from SKT_JOIN_EMP as em
+left join SKT_JOIN_ADDRESS as ad
+on em.zipcode=ad.zip_code;
+
+--Right Join
+select *
+from SKT_JOIN_EMP as em
+right join SKT_JOIN_ADDRESS as ad
+on em.zipcode=ad.zip_code;
+
+--Full Join
+select *
+from SKT_JOIN_EMP as em
+full join SKT_JOIN_ADDRESS as ad
+on em.zipcode=ad.zip_code;
+
+--Cross join
+SELECT * FROM 
+SKT_JOIN_EMP as em,SKT_JOIN_ADDRESS as ad;
+
+
+SELECT cust.cust_id,cust.cust_name,ord.order_id,ord.cust_id,ord.order_date FROM customer5 AS cust
+INNER JOIN order5 AS ord ON cust.cust_id=ord.cust_id;
+
+CREATE TABLE SKT_DEPT_WITH_CONSTRAINTS(
+dept_id INT PRIMARY KEY,
+dept_name VARCHAR(50)
+);
+
+CREATE TABLE SKT_EMP_WITH_CONSTRAINTS(
+emp_id INT PRIMARY KEY,
+emp_name VARCHAR(50) NOT NULL,
+emp_email VARCHAR(50) UNIQUE,
+emp_age INT CHECK (emp_age>18),
+emp_phone VARCHAR(50) UNIQUE,
+emp_second_phone VARCHAR(50) DEFAULT 'NO SECONDARY PHONE',
+emp_dept_id INT FOREIGN KEY REFERENCES SKT_DEPT_WITH_CONSTRAINTS(dept_id)
+);
+
+INSERT INTO SKT_DEPT_WITH_CONSTRAINTS 
+VALUES(10,'HR'),(11,'IT'),(12,'FIN')
+
+SELECT * FROM SKT_EMP_WITH_CONSTRAINTS;
+
+INSERT INTO SKT_EMP_WITH_CONSTRAINTS
+VALUES(2,'BOB','BOB@MAIL.COM',20,'1212','2288',10);
+
+
+INSERT INTO SKT_EMP_WITH_CONSTRAINTS(emp_id,emp_name,emp_email,emp_age,emp_phone,emp_dept_id)
+VALUES(5,'DON','DON@MAIL.COM',19,'1212387234',12);
+
+
+SELECT * FROM SKT_EMP_WITH_CONSTRAINTS;
+DROP TABLE SKT_DATA_FROM_MULTIPLE_FLAT;
+
+CREATE TABLE SKT_DATA_FROM_MULTIPLE_FLAT(
+id INT,
+name VARCHAR(50)
+);
+
+SELECT * FROM SKT_DATA_FROM_MULTIPLE_FLAT;
+
+ALTER VIEW SKT_VIEW_JOIN_2TABLES
+AS
+select *
+from SKT_JOIN_EMP as em
+INNER join SKT_JOIN_ADDRESS as ad
+on em.zipcode=ad.zip_code;
+
+SELECT * FROM SKT_VIEW_JOIN_2TABLES;
+
+CREATE VIEW SKT_VIEW_JOIN_EMP
+AS
+SELECT * FROM SKT_JOIN_EMP;
+
+SELECT * FROM SKT_VIEW_JOIN_EMP;
+
+INSERT INTO SKT_VIEW_JOIN_EMP
+VALUES(5,'E',10);
+
+SELECT * FROM SKT_VIEW_JOIN_EMP;
+
+CREATE TABLE SKT_NOT_3NF(
+student_id INT,
+student_name Varchar(50),
+subject_id INT,
+student_state VARCHAR(50),
+student_country VARCHAR(50)
+);
+
+
+INSERT INTO SKT_NOT_3NF 
+VALUES(1,'A',10,'Karnataka','India'),
+(2,'B',10,'Karnataka','India'),
+(3,'C',10,'Kerala','India');
+
+SELECT * FROM SKT_NOT_3NF;
+
+CREATE TABLE SKT_3NF_1(
+student_id INT,
+student_name Varchar(50),
+subject_id INT
+);
+
+INSERT INTO SKT_3NF_1
+VALUES(1,'A',10),
+(2,'B',10),
+(3,'C',10);
+
+SELECT * FROM SKT_3NF_1;
+
+CREATE TABLE SKT_3NF_2(
+student_id INT,
+state Varchar(50),
+country VARCHAR(50)
+);
+
+INSERT INTO SKT_3NF_2
+VALUES(1,'KARNATAKA','INDIA'),
+(2,'KARNATAKA','INDIA'),
+(3,'KERALA','INDIA'),
+(4,'MAHARASHTRA','INDIA');
+
+SELECT * FROM SKT_3NF_2;
+
+
+
+CREATE TABLE SKT_1NF(
+student_id INT,
+student_name Varchar(50));
+
+INSERT INTO SKT_1NF
+VALUES(1,'A'),
+(2,'B'),
+(3,'C');
+
+SELECT * FROM SKT_1NF;
+
+
+CREATE TABLE SKT_NOT_2NF(
+student_id INT,
+student_name Varchar(50),
+subject_id INT,
+subject_name VARCHAR(50)
+);
+
+INSERT INTO SKT_NOT_2NF
+VALUES(1,'A',10,'MATH'),
+(2,'B',11,'SCIENCE'),
+(3,'C',10,'MATH');
+
+SELECT * FROM SKT_NOT_2NF;
+
+CREATE TABLE SKT_2NF_2(
+subject_name Varchar(50),
+subject_id INT); 
+
+INSERT INTO SKT_2NF_2
+VALUES('MATH',10),
+('SCIENCE',11);
+
+
+SELECT * FROM SKT_2NF_2;
+
+DROP TABLE SKT_2NF_2;
