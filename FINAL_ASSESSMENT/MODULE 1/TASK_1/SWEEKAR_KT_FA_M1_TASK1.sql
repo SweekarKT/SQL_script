@@ -53,9 +53,8 @@ INSERT INTO  FA_RSRC_DETAILS(r_id, r_name ,r_phone, r_mail, r_address, r_gender,
 skill1_id,yrs_exp_in_skill1,skill2_id,yrs_exp_in_skill2,r_wrk_off,r_wrk_on,r_wrk_multi_loc)
 VALUES(12,'Charlie','4123233303','charlie@mail.com','qqq wwww eee','Male',22,'POU3R356',NULL,102,1,NULL,NULL,0,1,0);
 
-UPDATE FA_RSRC_DETAILS SET yrs_exp_in_skill2=0 WHERE r_id=11;
-
-SELECT * FROM FA_RSRC_DETAILS WHERE yrs_exp_in_skill1>1 OR yrs_exp_in_skill2>1 ;
+UPDATE FA_RSRC_DETAILS SET skill2_id = 106 WHERE r_id=7;
+SELECT * FROM FA_RSRC_DETAILS ;
 
 DROP TABLE FA_RSRC_DETAILS;
 
@@ -74,17 +73,33 @@ r_certification2 VARCHAR(50),
 r_wh_ppr_pb_topic1 VARCHAR(50),
 r_wh_ppr_pb_topic2 VARCHAR(50)
 );
+(1,'Apple','SWE',10,3,'DA',15,2,'Information Security','Cybersecurity','Secure systems','Risk and Informations system control'),
+(1,'Microsoft','DA',21,2,NULL,NULL,NULL,'Solutions Expert',NULL,NULL,NULL);
+
 
 INSERT INTO FA_RS_COMP_DETAILS(r_id, r_comp_name ,r_comp_rol1, r_comp_rol1_team_cap, r_comp_rol1_exp,
 r_comp_rol2,r_comp_rol2_team_cap,r_comp_ro2_exp,r_certification1,r_certification2,r_wh_ppr_pb_topic1,r_wh_ppr_pb_topic2) 
-VALUES(1,'Apple','SWE',10,3,'DA',15,2,'Information Security','Cybersecurity','Secure systems','Risk and Informations system control'),
-(1,'Microsoft','DA',21,2,NULL,NULL,NULL,'Solutions Expert',NULL,NULL,NULL);
-(1,'Apple','SWE',10,3,'DA',15,2,'Information Security','Cybersecurity','Secure systems','Risk and Informations system control'),
-(1,'Microsoft','DA',21,2,NULL,NULL,NULL,'Solutions Expert',NULL,NULL,NULL);
-(1,'Apple','SWE',10,3,'DA',15,2,'Information Security','Cybersecurity','Secure systems','Risk and Informations system control'),
-(1,'Microsoft','DA',21,2,NULL,NULL,NULL,'Solutions Expert',NULL,NULL,NULL);
+VALUES(2,'Apple','SWE',10,3,'DA',15,2,'Information Security','Cybersecurity','Secure systems','Risk and Informations system control'),
+(3,'Microsoft','DA',21,2,NULL,NULL,NULL,'Solutions Expert',NULL,NULL,NULL),
+(5,'Apple','SWE',10,3,'DA',15,2,'Information Security','Cybersecurity','Secure systems','Risk and Informations system control'),
+(7,'Facebook','DA',21,2,'Linkdin',10,5,'Solutions Expert',NULL,'YES',NULL),
+(5,'Linkedin','Web Developer',6,2,'DA',15,2,'Information Security','Cybersecurity','Secure systems','Risk and Informations system control'),
+(1,'Google','DA',21,2,NULL,NULL,NULL,'YES',NULL,NULL,NULL),
+(8,'Apple','SWE',8,1,'Web Devoloper',15,2,'Information Security',NULL,'Secure systems','Risk and Informations system control'),
+(11,'Microsoft','DA',21,2,NULL,NULL,NULL,'Employee of the Month',NULL,'YES',NULL),
+(3,'Apple','SWE',10,3,'DA',15,2,'Information Security','Cybersecurity','Software Development','Risk and Informations system control'),
+(7,'Google','DA',21,2,NULL,NULL,NULL,'Solutions Expert',NULL,NULL,NULL),
+(2,'Netflix','Tech Lead',10,3,'DA',15,2,'Information Security','Cybersecurity','Secure systems','Risk and Informations system control'),
+(10,'Microsoft','Tester',21,2,NULL,NULL,NULL,'Solutions Expert',NULL,NULL,NULL),
+(9,'Apple','SWE',10,3,'DA',15,2,'Information Security','Cybersecurity','Secure systems','Risk and Informations system control'),
+(4,'Amazon','DA',21,2,'Apple',5,5,'Solutions Expert',NULL,'YES',NULL),
+(6,'Apple','Data Scientist',10,3,'DA',15,2,'Data Cleaning','Data Analysis','Secure systems','Risk and Informations system control'),
+(6,'Microsoft','DA',21,2,NULL,NULL,NULL,'Analysis Expert',NULL,'Data Analysis',NULL),
+(4,'Apple','SWE',6,5,'Architect',15,2,'Information Security','Cybersecurity','Secure systems','Risk and Informations system control'),
+(5,'Microsoft','QA',21,2,'Amazon',15,5,'YES',NULL,'YES',NULL);
 
-SELECT * FROM FA_RS_COMP_DETAILS WHERE ;
+
+SELECT * FROM FA_RS_COMP_DETAILS ;
 
 DROP TABLE FA_RS_COMP_DETAILS;
 
@@ -180,3 +195,76 @@ SELECT * FROM FA_RESOURCE_FROM_JOB_PORTAL;
 
 DROP TABLE FA_RESOURCE_FROM_JOB_PORTAL;
 
+SELECT * FROM FA_HR_SKILLS;
+SELECT * FROM FA_RSRC_DETAILS;
+SELECT * FROM FA_RS_COMP_DETAILS;
+SELECT * FROM FA_RESOURCE_FROM_JOB_PORTAL;
+
+
+--JOINS
+--INNER JOIN
+--The below query gives the resources having multiple skills
+SELECT *
+FROM FA_HR_SKILLS AS SK
+INNER JOIN FA_RSRC_DETAILS AS RD ON SK.skill_id  = RD.skill2_id
+WHERE skill2_id IS NOT NULL;
+
+--LEFT JOIN
+--The below query gives the person who has not worked in any company
+SELECT *  FROM FA_RSRC_DETAILS AS PD
+LEFT JOIN FA_RS_COMP_DETAILS AS CD ON PD.r_id = CD.r_id
+WHERE CD.r_id IS NULL;
+
+--RIGHT JOIN
+--The below query returns the non matching skill1 which no has
+SELECT SK.skill_id,SK.skill_name  FROM FA_RSRC_DETAILS AS RD
+RIGHT JOIN  FA_HR_SKILLS AS SK ON  RD.skill1_id = SK.skill_id
+WHERE r_id IS NULL;
+
+--FULL JOIN 
+--returns the matching and non matching rows from both the columns
+SELECT * FROM FA_RSRC_DETAILS AS RD
+RIGHT JOIN  FA_HR_SKILLS AS SK ON  RD.skill1_id = SK.skill_id;
+
+SELECT * FROM FA_RSRC_DETAILS AS RD
+RIGHT JOIN  FA_RESOURCE_FROM_JOB_PORTAL AS JP ON  RD.r_id = JP.r_id;
+
+--VIEWS
+--The below view is created to retreive the resource with all the requirements
+CREATE VIEW FA_M1_T1_PERFECT_RSRC AS
+SELECT RD.r_id,r_name FROM FA_RSRC_DETAILS AS RD
+INNER JOIN FA_RESOURCE_FROM_JOB_PORTAL AS JP ON RD.r_id = JP.r_id 
+WHERE
+r_wrk_multi_comp = 1 AND
+r_has_multi_skills = 1 AND
+r_multi_yrs_exp_with_skills = 1 AND
+r_work_multi_loc = 1 AND
+r_wrk_offshore = 1 AND
+r_wrk_onsite = 1 AND
+r_has_multi_visa = 1 AND
+r_wrk_multi_roles = 1 AND
+r_mng_diff_team_capc = 1 AND
+r_certification = 1 AND
+r_wh_ppr_pb_in_diff_cat = 1;
+
+SELECT * FROM FA_M1_T1_PERFECT_RSRC;
+DROP VIEW FA_M1_T1_PERFECT_RSRC;
+
+--The below view is created to retreive the skills which no one has
+CREATE VIEW FA_M1_T1_SKILL_NO_RSRC_HAS AS
+SELECT skill_id,skill_name  FROM FA_HR_SKILLS
+WHERE skill_id NOT IN  (SELECT DISTINCT skill1_id FROM FA_RSRC_DETAILS WHERE skill1_id IS NOT NULL)
+AND  skill_id NOT IN (SELECT DISTINCT skill2_id FROM FA_RSRC_DETAILS WHERE skill2_id IS NOT NULL);
+
+SELECT * FROM FA_M1_T1_SKILL_NO_RSRC_HAS;
+DROP VIEW FA_M1_T1_SKILL_NO_RSRC_HAS;
+
+
+--The below view retreives the resources having particular skill(DOT NET)
+CREATE VIEW FA_M1_T1_RSCRS_WITH_PARTICULAR_SKILL AS
+SELECT r_id,r_name,(SELECT skill_name FROM FA_HR_SKILLS WHERE skill_id = 101) AS skill_name 
+FROM FA_RSRC_DETAILS
+WHERE skill1_id=101 OR skill2_id = 101;
+
+SELECT * FROM FA_M1_T1_RSCRS_WITH_PARTICULAR_SKILL;
+DROP VIEW FA_M1_T1_RSCRS_WITH_PARTICULAR_SKILL;
